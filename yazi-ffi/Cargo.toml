@@ -20,6 +20,7 @@ yazi-shim  = { path = "../yazi-shim", version = "26.9.1" }
 chrono        = { workspace = true }
 data-encoding = { workspace = true }
 libc          = { workspace = true }
+libloading    = { workspace = true }
 mlua          = { workspace = true }
 rand          = { workspace = true }
 strum         = { workspace = true }

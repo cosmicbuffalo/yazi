@@ -60,6 +60,9 @@ keymap = [
 	# Spotting
 	{ on = "<Tab>", run = "spot", desc = "Spot hovered file" },
 
+	# Playing
+	{ on = "M", run = "play", desc = "Play hovered video in the preview" },
+
 	# Operation
 	{ on = "o",         run = "open",                        desc = "Open selected files" },
 	{ on = "O",         run = "open --interactive",          desc = "Open selected files interactively" },
@@ -206,6 +209,34 @@ keymap = [
 
 	# Copy
 	{ on = [ "c", "c" ], run = "copy cell", desc = "Copy selected cell" },
+
+	# Help
+	{ on = "~",    run = "help", desc = "Open help" },
+	{ on = "<F1>", run = "help", desc = "Open help" },
+]
+
+[player]
+
+keymap = [
+	{ on = "<Esc>", run = "close", desc = "Stop playback" },
+	{ on = "<C-[>", run = "close", desc = "Stop playback" },
+	{ on = "<C-c>", run = "close", desc = "Stop playback" },
+	{ on = "q",     run = "close", desc = "Stop playback" },
+
+	{ on = "<Space>", run = "pause", desc = "Toggle pause" },
+	{ on = "m",       run = "mute",  desc = "Toggle mute" },
+
+	{ on = "h", run = "seek -5",  desc = "Seek back 5 seconds" },
+	{ on = "l", run = "seek 5",   desc = "Seek forward 5 seconds" },
+	{ on = "H", run = "seek -30", desc = "Seek back 30 seconds" },
+	{ on = "L", run = "seek 30",  desc = "Seek forward 30 seconds" },
+	{ on = "k", run = "volume 5",  desc = "Volume up" },
+	{ on = "j", run = "volume -5", desc = "Volume down" },
+
+	{ on = "<Left>",  run = "seek -5",   desc = "Seek back 5 seconds" },
+	{ on = "<Right>", run = "seek 5",    desc = "Seek forward 5 seconds" },
+	{ on = "<Up>",    run = "volume 5",  desc = "Volume up" },
+	{ on = "<Down>",  run = "volume -5", desc = "Volume down" },
 
 	# Help
 	{ on = "~",    run = "help", desc = "Open help" },

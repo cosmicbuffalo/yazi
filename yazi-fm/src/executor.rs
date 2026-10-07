@@ -21,6 +21,7 @@ impl<'a> Executor<'a> {
 			Layer::Mgr => self.mgr(action),
 			Layer::Tasks => self.tasks(action),
 			Layer::Spot => self.spot(action),
+			Layer::Player => self.player(action),
 			Layer::Pick => self.pick(action),
 			Layer::Input => self.input(action),
 			Layer::Confirm => self.confirm(action),
@@ -81,6 +82,7 @@ impl<'a> Executor<'a> {
 		on!(update_paged);
 		on!(watch);
 		on!(peek);
+		on!(play);
 		on!(seek);
 		on!(spot);
 		on!(refresh);
@@ -214,6 +216,35 @@ impl<'a> Executor<'a> {
 		match action.name.as_ref() {
 			// Help
 			"help" => act!(help:toggle, cx, Layer::Spot),
+			// Plugin
+			"plugin" => act!(app:plugin, cx, action),
+			// Lua
+			"lua" => act!(app:lua, cx, action),
+			_ => succ!(),
+		}
+	}
+
+	fn player(&mut self, action: ActionCow) -> Result<Data> {
+		let cx = &mut Ctx::new(&action, &mut self.app.core, &mut self.app.term)?;
+
+		macro_rules! on {
+			($name:ident) => {
+				if action.name == stringify!($name) {
+					return act!(player:$name, cx, action);
+				}
+			};
+		}
+
+		on!(close);
+		on!(mute);
+		on!(pause);
+		on!(seek);
+		on!(tick);
+		on!(volume);
+
+		match action.name.as_ref() {
+			// Help
+			"help" => act!(help:toggle, cx, Layer::Player),
 			// Plugin
 			"plugin" => act!(app:plugin, cx, action),
 			// Lua

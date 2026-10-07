@@ -4,7 +4,7 @@ use yazi_core::Core;
 use yazi_macro::log_if_err;
 use yazi_plugin::LUA;
 
-use super::{cmp, confirm, help, input, mgr, pick, spot, tasks, which};
+use super::{cmp, confirm, help, input, mgr, pick, player, spot, tasks, which};
 use crate::Renderer;
 
 pub(super) struct Root<'a> {
@@ -26,6 +26,7 @@ impl Widget for Root<'_> {
 		log_if_err!("Redrawing `Root`", Renderer::new(self.core, "Root").render(area, buf));
 
 		mgr::Preview::new(self.core).render(area, buf);
+		player::Player::new(self.core).render(area, buf);
 		mgr::Modal::new(self.core).render(area, buf);
 
 		if self.core.tasks.visible {

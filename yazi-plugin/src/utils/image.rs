@@ -33,6 +33,19 @@ impl Utils {
 		})
 	}
 
+	pub(super) fn video_play(lua: &Lua) -> mlua::Result<Function> {
+		lua.create_async_function(|lua, (url, rect, muted): (UrlRef, Rect, Option<bool>)| async move {
+			let Some(path) = url.as_local() else {
+				return (Value::Nil, Error::other("Source must be a local path")).into_lua_multi(&lua);
+			};
+
+			match ADAPTOR.video_play(path, *rect, muted.unwrap_or_default()).await {
+				Ok(area) => Rect::from(area).into_lua_multi(&lua),
+				Err(e) => (Value::Nil, Error::other(e.to_string())).into_lua_multi(&lua),
+			}
+		})
+	}
+
 	pub(super) fn image_precache(lua: &Lua) -> mlua::Result<Function> {
 		lua.create_async_function(|lua, (src, dist): (UrlRef, UrlRef)| async move {
 			let Some(src) = src.as_local().owned() else {

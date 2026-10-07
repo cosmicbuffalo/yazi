@@ -11,6 +11,7 @@ pub struct PeekJob {
 	pub mime:      Symbol<str>,
 	pub sig:       Id,
 	pub skip:      usize,
+	pub play:      bool,
 }
 
 impl IntoLua for PeekJob {
@@ -23,6 +24,7 @@ impl IntoLua for PeekJob {
 				("mime", self.mime.into_lua(lua)?),
 				("sig", self.sig.into_lua(lua)?),
 				("skip", self.skip.into_lua(lua)?),
+				("play", self.play.into_lua(lua)?),
 			])?
 			.into_lua(lua)
 	}

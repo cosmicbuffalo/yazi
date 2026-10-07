@@ -1,4 +1,5 @@
 use ratatui_core::layout::{Position, Rect};
+use yazi_adapter::ADAPTOR;
 use yazi_shared::Layer;
 use yazi_shim::ratatui::Padable;
 use yazi_tty::sequence::SetCursorStyle;
@@ -64,6 +65,8 @@ impl Core {
 			Layer::Pick
 		} else if self.active().spot.visible() {
 			Layer::Spot
+		} else if self.active().preview.play && ADAPTOR.video_playing() {
+			Layer::Player
 		} else if self.tasks.visible {
 			Layer::Tasks
 		} else {

@@ -8,7 +8,7 @@ use ratatui_core::{layout::Rect, style::Color};
 use yazi_config::THEME;
 use yazi_emulator::{CLOSE, EMULATOR, ESCAPE, Emulator, START};
 use yazi_ffi::shm::NamedSharedMemory;
-use yazi_tty::sequence::{MoveTo, ResetAttrs, SetBg, SetFg};
+use yazi_tty::{TTY, sequence::{MoveTo, ResetAttrs, SetBg, SetFg}};
 
 use super::KgpPayload;
 use crate::{ADAPTOR, drivers::kgp_id, image::Image};
@@ -320,7 +320,7 @@ impl Kgp {
 		let img = Image::downscale(path, max).await?;
 		let area = Image::pixel_area((img.width(), img.height()), max);
 
-		let b1 = Self::encode(img).await?;
+		let b1 = Self::encode(img, None).await?;
 		let b2 = Self::place(&area)?;
 
 		ADAPTOR.image_hide()?;
@@ -330,6 +330,23 @@ impl Kgp {
 			w.write_all(&b2)?;
 			Ok(area)
 		})
+	}
+
+	pub(super) async fn frame_show(img: DynamicImage, area: Rect, placed: bool) -> Result<()> {
+		let b1 = Self::encode(img, Some((area.width, area.height))).await?;
+		if !placed {
+			let b2 = Self::place(&area)?;
+			return Emulator::move_lock((area.x, area.y), |w| {
+				w.write_all(&b1)?;
+				Ok(w.write_all(&b2)?)
+			});
+		}
+
+		// Placeholders are already on screen, so swapping the image data needs no
+		// cursor movement, which would otherwise flicker under multiplexers.
+		let mut w = TTY.lockout();
+		w.write_all(&b1)?;
+		Ok(w.flush()?)
 	}
 
 	pub(super) fn image_erase(area: Rect) -> Result<()> {
@@ -349,12 +366,14 @@ impl Kgp {
 		})
 	}
 
-	async fn encode(img: DynamicImage) -> Result<KgpPayload> {
-		fn output(raw: &[u8], format: u8, size: (u32, u32)) -> Result<KgpPayload> {
-			output_shm(raw, format, size).or_else(|_| output_b64(raw, format, size))
+	/// Encodes the image, optionally scaled to fit `cells` (columns, rows) instead
+	/// of being sized by its pixels.
+	async fn encode(img: DynamicImage, cells: Option<(u16, u16)>) -> Result<KgpPayload> {
+		fn output(raw: &[u8], format: u8, size: (u32, u32), cells: &str) -> Result<KgpPayload> {
+			output_shm(raw, format, size, cells).or_else(|_| output_b64(raw, format, size, cells))
 		}
 
-		fn output_shm(raw: &[u8], format: u8, (w, h): (u32, u32)) -> Result<KgpPayload> {
+		fn output_shm(raw: &[u8], format: u8, (w, h): (u32, u32), cells: &str) -> Result<KgpPayload> {
 			if !EMULATOR.kgp_shm.get() {
 				bail!("Shared memory is not supported by the terminal")
 			}
@@ -362,7 +381,7 @@ impl Kgp {
 			let mut pl = KgpPayload::with(200, NamedSharedMemory::new(raw)?);
 			write!(
 				pl,
-				"{START}_Gq=2,a=T,C=1,U=1,t=s,f={format},s={w},v={h},i={},S={};{}{ESCAPE}\\{CLOSE}",
+				"{START}_Gq=2,a=T,C=1,U=1{cells},t=s,f={format},s={w},v={h},i={},S={};{}{ESCAPE}\\{CLOSE}",
 				kgp_id(),
 				raw.len(),
 				pl.name(),
@@ -371,14 +390,14 @@ impl Kgp {
 			Ok(pl)
 		}
 
-		fn output_b64(raw: &[u8], format: u8, (w, h): (u32, u32)) -> Result<KgpPayload> {
+		fn output_b64(raw: &[u8], format: u8, (w, h): (u32, u32), cells: &str) -> Result<KgpPayload> {
 			let b64 = general_purpose::STANDARD.encode(raw).into_bytes();
 			let mut it = b64.chunks(4096).peekable();
 			let mut pl = KgpPayload::new(b64.len() + it.len() * 50);
 			if let Some(first) = it.next() {
 				write!(
 					pl,
-					"{START}_Gq=2,a=T,C=1,U=1,f={format},s={w},v={h},i={},m={};{}{ESCAPE}\\{CLOSE}",
+					"{START}_Gq=2,a=T,C=1,U=1{cells},f={format},s={w},v={h},i={},m={};{}{ESCAPE}\\{CLOSE}",
 					kgp_id(),
 					it.peek().is_some() as u8,
 					unsafe { str::from_utf8_unchecked(first) },
@@ -395,10 +414,11 @@ impl Kgp {
 		}
 
 		let size = (img.width(), img.height());
+		let cells = cells.map(|(c, r)| format!(",c={c},r={r}")).unwrap_or_default();
 		tokio::task::spawn_blocking(move || match img {
-			DynamicImage::ImageRgb8(v) => output(v.as_raw(), 24, size),
-			DynamicImage::ImageRgba8(v) => output(v.as_raw(), 32, size),
-			v => output(v.into_rgb8().as_raw(), 24, size),
+			DynamicImage::ImageRgb8(v) => output(v.as_raw(), 24, size, &cells),
+			DynamicImage::ImageRgba8(v) => output(v.as_raw(), 32, size, &cells),
+			v => output(v.into_rgb8().as_raw(), 24, size, &cells),
 		})
 		.await?
 	}

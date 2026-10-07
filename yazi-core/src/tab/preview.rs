@@ -13,6 +13,7 @@ use crate::{AppProxy, Highlighter, MgrProxy, tab::{PreviewLock, PreviewSig}};
 pub struct Preview {
 	pub lock:        Option<PreviewLock>,
 	pub skip:        usize,
+	pub play:        bool,
 	pub folder_lock: Option<UrlBuf>,
 
 	handle: Option<JoinHandle<()>>,
@@ -37,7 +38,7 @@ impl Preview {
 		self.abort();
 		self.scope = Scope::new();
 
-		let job = PeekJob { previewer, file, mime, sig, skip: self.skip };
+		let job = PeekJob { previewer, file, mime, sig, skip: self.skip, play: self.play };
 		let scope = self.scope.clone();
 
 		self.handle = Some(tokio::spawn(async move {
@@ -58,7 +59,15 @@ impl Preview {
 
 	pub fn reset(&mut self) {
 		self.abort();
+		self.play = false;
 		ADAPTOR.image_hide().ok();
+		render!(self.lock.take().is_some())
+	}
+
+	/// Drops the stale lock while keeping any video playing, so the previewer can
+	/// relocate it instead of starting it over.
+	pub fn unlock(&mut self) {
+		self.abort();
 		render!(self.lock.take().is_some())
 	}
 

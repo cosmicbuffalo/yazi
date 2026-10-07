@@ -26,6 +26,9 @@ pub(crate) fn compose(
 			b"image_show" => Utils::image_show(lua)?,
 			b"image_precache" => Utils::image_precache(lua)?,
 
+			// Video
+			b"video_play" => Utils::video_play(lua)?,
+
 			// JSON
 			b"json_encode" => Utils::json_encode(lua)?,
 			b"json_decode" => Utils::json_decode(lua)?,

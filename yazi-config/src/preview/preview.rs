@@ -25,6 +25,8 @@ pub struct Preview {
 	#[serde(deserialize_with = "deserialize_image_quality")]
 	pub image_quality: u8,
 
+	pub video_autoplay: bool,
+
 	pub ueberzug_scale:  f32,
 	pub ueberzug_offset: (f32, f32, f32, f32),
 }

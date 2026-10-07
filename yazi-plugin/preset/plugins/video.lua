@@ -1,6 +1,16 @@
 local M = {}
 
 function M:peek(job)
+	if job.play or rt.preview.video_autoplay then
+		local area = ui.Rect { x = job.area.x, y = job.area.y, w = job.area.w, h = math.max(0, job.area.h - 1) }
+		local _, err = ya.video_play(job.file.url, area, not job.play)
+		if not err then
+			return ya.preview_widget(job)
+		elseif job.play then
+			ya.notify { title = "Video", content = tostring(err), timeout = 5, level = "warn" }
+		end
+	end
+
 	local start, cache = os.clock(), ya.file_cache(job)
 	if not cache then
 		return

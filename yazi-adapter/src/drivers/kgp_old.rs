@@ -33,6 +33,17 @@ impl KgpOld {
 		})
 	}
 
+	pub(super) async fn frame_show(img: DynamicImage, area: Rect) -> Result<()> {
+		let size = (img.width(), img.height());
+		let b1 = Self::encode(img, size).await?;
+		let b2 = Self::place(area, size)?;
+
+		Emulator::move_lock((area.x, area.y), |w| {
+			w.write_all(&b1)?;
+			Ok(w.write_all(&b2)?)
+		})
+	}
+
 	pub(super) fn image_erase(area: Rect) -> Result<()> {
 		let mut w = TTY.lockout();
 		let Some(shown) = ADAPTOR.shown_area() else {

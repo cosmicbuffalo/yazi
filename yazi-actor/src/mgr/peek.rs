@@ -1,4 +1,5 @@
 use anyhow::Result;
+use yazi_adapter::ADAPTOR;
 use yazi_macro::{succ, tab};
 use yazi_parser::mgr::PeekForm;
 use yazi_shared::{data::Data, url::UrlLike};
@@ -25,7 +26,10 @@ impl Actor for Peek {
 		if !cx.tab().preview.same_url(&hovered.url) {
 			cx.tab_mut().preview.skip = cx.hovered_folder().map(|f| f.offset).unwrap_or_default();
 		}
-		if !cx.tab().preview.same_file(&hovered, &mime) {
+		if cx.tab().preview.same_file(&hovered, &mime) {
+		} else if cx.tab().preview.same_url(&hovered.url) && ADAPTOR.video_playing() {
+			cx.tab_mut().preview.unlock();
+		} else {
 			cx.tab_mut().preview.reset();
 		}
 		if !cx.tab().preview.same_folder(&hovered.url) {

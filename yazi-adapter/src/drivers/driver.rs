@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
-use anyhow::Result;
+use anyhow::{Result, bail};
+use image::DynamicImage;
 use ratatui_core::layout::Rect;
 use strum::{Display, IntoStaticStr};
 
@@ -49,6 +50,22 @@ impl Driver {
 			Self::X11 | Self::Wayland => Ueberzug::image_erase(area),
 			Self::Chafa => Chafa::image_erase(area),
 		}
+	}
+
+	pub(crate) async fn frame_show(self, img: DynamicImage, area: Rect, placed: bool) -> Result<()> {
+		match self {
+			Self::Kgp => Kgp::frame_show(img, area, placed).await,
+			Self::KgpOld => KgpOld::frame_show(img, area).await,
+			Self::Iip => Iip::frame_show(img, area).await,
+			Self::Sixel => Sixel::frame_show(img, area).await,
+			Self::X11 | Self::Wayland | Self::Chafa => {
+				bail!("Video playback is not supported by `{self}`")
+			}
+		}
+	}
+
+	pub(crate) fn supports_video(self) -> bool {
+		matches!(self, Self::Kgp | Self::KgpOld | Self::Iip | Self::Sixel)
 	}
 
 	pub(crate) fn start(self) { Ueberzug::start(self); }

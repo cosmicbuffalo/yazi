@@ -129,6 +129,8 @@ fn preview() -> Composer<ComposerGet, ComposerSet> {
 			b"image_filter" => lua.create_string(&p.image_filter)?.into_lua(lua)?,
 			b"image_quality" => p.image_quality.into_lua(lua)?,
 
+			b"video_autoplay" => p.video_autoplay.into_lua(lua)?,
+
 			b"ueberzug_scale" => p.ueberzug_scale.into_lua(lua)?,
 			b"ueberzug_offset" => lua.to_value_with(&p.ueberzug_offset, SER_OPT)?,
 			_ => return Ok(Value::Nil),

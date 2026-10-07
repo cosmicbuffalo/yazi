@@ -32,6 +32,11 @@ impl Sixel {
 		})
 	}
 
+	pub(super) async fn frame_show(img: DynamicImage, area: Rect) -> Result<()> {
+		let b = Self::encode(img).await?;
+		Emulator::move_lock((area.x, area.y), |w| Ok(w.write_all(&b)?))
+	}
+
 	pub(super) fn image_erase(area: Rect) -> Result<()> {
 		let s = " ".repeat(area.width as usize);
 		Emulator::move_lock((0, 0), |w| {

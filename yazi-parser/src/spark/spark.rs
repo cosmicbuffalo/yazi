@@ -66,6 +66,7 @@ pub enum Spark<'a> {
 	OpenDo(crate::mgr::OpenDoForm),
 	Paste(crate::mgr::PasteForm),
 	Peek(crate::mgr::PeekForm),
+	Play(crate::VoidForm),
 	Quit(crate::app::QuitForm),
 	Refresh(crate::VoidForm),
 	Remove(crate::mgr::RemoveForm),
@@ -145,6 +146,14 @@ pub enum Spark<'a> {
 	SpotClose(crate::VoidForm),
 	SpotCopy(crate::spot::CopyForm),
 	SpotSwipe(crate::ArrowForm),
+
+	// Player
+	PlayerClose(crate::VoidForm),
+	PlayerMute(crate::VoidForm),
+	PlayerPause(crate::VoidForm),
+	PlayerSeek(crate::player::SeekForm),
+	PlayerTick(crate::VoidForm),
+	PlayerVolume(crate::player::VolumeForm),
 
 	// Tasks
 	TasksArrow(crate::ArrowForm),
@@ -267,6 +276,7 @@ impl<'a> IntoLua for Spark<'a> {
 			Self::OpenDo(b) => b.into_lua(lua),
 			Self::Paste(b) => b.into_lua(lua),
 			Self::Peek(b) => b.into_lua(lua),
+			Self::Play(b) => b.into_lua(lua),
 			Self::Quit(b) => b.into_lua(lua),
 			Self::Refresh(b) => b.into_lua(lua),
 			Self::Remove(b) => b.into_lua(lua),
@@ -347,6 +357,14 @@ impl<'a> IntoLua for Spark<'a> {
 			Self::SpotCopy(b) => b.into_lua(lua),
 			Self::SpotSwipe(b) => b.into_lua(lua),
 
+			// Player
+			Self::PlayerClose(b) => b.into_lua(lua),
+			Self::PlayerMute(b) => b.into_lua(lua),
+			Self::PlayerPause(b) => b.into_lua(lua),
+			Self::PlayerSeek(b) => b.into_lua(lua),
+			Self::PlayerTick(b) => b.into_lua(lua),
+			Self::PlayerVolume(b) => b.into_lua(lua),
+
 			// Tasks
 			Self::TasksArrow(b) => b.into_lua(lua),
 			Self::TasksCancel(b) => b.into_lua(lua),
@@ -374,6 +392,11 @@ try_from_spark!(
 	mgr:back,
 	mgr:bulk_rename,
 	mgr:enter,
+	mgr:play,
+	player:close,
+	player:mute,
+	player:pause,
+	player:tick,
 	mgr:escape_filter,
 	mgr:escape_find,
 	mgr:escape_select,
@@ -463,6 +486,8 @@ try_from_spark!(crate::notify::PushForm, notify:push);
 try_from_spark!(crate::notify::TickForm, notify:tick);
 try_from_spark!(crate::pick::CloseForm, pick:close);
 try_from_spark!(crate::pick::ShowForm, pick:show);
+try_from_spark!(crate::player::SeekForm, player:seek);
+try_from_spark!(crate::player::VolumeForm, player:volume);
 try_from_spark!(crate::spot::CopyForm, spot:copy);
 try_from_spark!(crate::tasks::ProcessOpenForm, tasks:process_open);
 try_from_spark!(crate::tasks::SpawnForm, tasks:spawn);

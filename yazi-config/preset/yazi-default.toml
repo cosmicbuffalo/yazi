@@ -26,6 +26,7 @@ cache_dir       = ""
 image_delay     = 30
 image_filter    = "triangle"
 image_quality   = 75
+video_autoplay  = false
 ueberzug_scale  = 1
 ueberzug_offset = [ 0, 0, 0, 0 ]
 

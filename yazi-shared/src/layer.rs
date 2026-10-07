@@ -31,6 +31,7 @@ pub enum Layer {
 	Mgr,
 	Tasks,
 	Spot,
+	Player,
 	Pick,
 	Input,
 	Confirm,

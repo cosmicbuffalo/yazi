@@ -30,6 +30,7 @@ yazi_macro::mod_flat!(
 	open_do
 	paste
 	peek
+	play
 	quit
 	refresh
 	remove
