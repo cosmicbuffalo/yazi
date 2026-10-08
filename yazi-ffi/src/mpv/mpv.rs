@@ -45,6 +45,10 @@ impl Drop for Mpv {
 impl Mpv {
 	pub fn new(options: &[(&str, &str)]) -> io::Result<Self> {
 		let lib = Library::get()?;
+
+		// libmpv refuses to start under a non-C numeric locale, which a library may
+		// have picked up from `LANG` (e.g. `en_US.UTF-8`).
+		unsafe { libc::setlocale(libc::LC_NUMERIC, c"C".as_ptr()) };
 		let handle = unsafe { (lib.create)() };
 		if handle.is_null() {
 			return Err(io::Error::other("failed to create mpv instance"));
