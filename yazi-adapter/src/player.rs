@@ -35,6 +35,7 @@ pub struct PlayerStatus {
 	pub paused:   bool,
 	pub muted:    bool,
 	pub volume:   i64,
+	pub speed:    f64,
 }
 
 impl Drop for Player {
@@ -106,6 +107,7 @@ impl Player {
 			paused:   mpv.get_bool("pause").unwrap_or_default(),
 			muted:    mpv.get_bool("mute").unwrap_or_default(),
 			volume:   mpv.get_i64("volume").unwrap_or_default(),
+			speed:    mpv.get_f64("speed").unwrap_or(1.0),
 		}
 	}
 

@@ -239,6 +239,8 @@ impl<'a> Executor<'a> {
 		on!(mute);
 		on!(pause);
 		on!(seek);
+		on!(speed);
+		on!(step);
 		on!(tick);
 		on!(volume);
 

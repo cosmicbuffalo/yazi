@@ -152,6 +152,8 @@ pub enum Spark<'a> {
 	PlayerMute(crate::VoidForm),
 	PlayerPause(crate::VoidForm),
 	PlayerSeek(crate::player::SeekForm),
+	PlayerSpeed(crate::player::SpeedForm),
+	PlayerStep(crate::player::StepForm),
 	PlayerTick(crate::VoidForm),
 	PlayerVolume(crate::player::VolumeForm),
 
@@ -362,6 +364,8 @@ impl<'a> IntoLua for Spark<'a> {
 			Self::PlayerMute(b) => b.into_lua(lua),
 			Self::PlayerPause(b) => b.into_lua(lua),
 			Self::PlayerSeek(b) => b.into_lua(lua),
+			Self::PlayerSpeed(b) => b.into_lua(lua),
+			Self::PlayerStep(b) => b.into_lua(lua),
 			Self::PlayerTick(b) => b.into_lua(lua),
 			Self::PlayerVolume(b) => b.into_lua(lua),
 
@@ -487,6 +491,8 @@ try_from_spark!(crate::notify::TickForm, notify:tick);
 try_from_spark!(crate::pick::CloseForm, pick:close);
 try_from_spark!(crate::pick::ShowForm, pick:show);
 try_from_spark!(crate::player::SeekForm, player:seek);
+try_from_spark!(crate::player::SpeedForm, player:speed);
+try_from_spark!(crate::player::StepForm, player:step);
 try_from_spark!(crate::player::VolumeForm, player:volume);
 try_from_spark!(crate::spot::CopyForm, spot:copy);
 try_from_spark!(crate::tasks::ProcessOpenForm, tasks:process_open);

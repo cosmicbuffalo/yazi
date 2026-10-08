@@ -233,6 +233,12 @@ keymap = [
 	{ on = "k", run = "volume 5",  desc = "Volume up" },
 	{ on = "j", run = "volume -5", desc = "Volume down" },
 
+	{ on = "]",           run = "speed 1.25",    desc = "Speed up playback" },
+	{ on = "[",           run = "speed 0.8",     desc = "Slow down playback" },
+	{ on = "<Backspace>", run = "speed --reset", desc = "Reset playback speed" },
+	{ on = ".",           run = "step 1",        desc = "Next frame" },
+	{ on = ",",           run = "step -1",       desc = "Previous frame" },
+
 	{ on = "<Left>",  run = "seek -5",   desc = "Seek back 5 seconds" },
 	{ on = "<Right>", run = "seek 5",    desc = "Seek forward 5 seconds" },
 	{ on = "<Up>",    run = "volume 5",  desc = "Volume up" },
